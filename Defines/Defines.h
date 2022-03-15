@@ -13,9 +13,9 @@ using namespace std;
 #define DEBUG_PROGRESS false
 #define DEBUG_NORMAL_CACHE false
 #define DEBUG_REDUCED_CACHE false
-#define DEBUG_INITIAL_TRIE true
-#define DEBUG_PROCESSED_TRIE true
-#define DEBUG_REDUCED_TRIE true
+#define DEBUG_INITIAL_TRIE false
+#define DEBUG_PROCESSED_TRIE false
+#define DEBUG_REDUCED_TRIE false
 
 typedef unordered_set<string> name_set;
 typedef unordered_map<int, name_set> modal_names_map;

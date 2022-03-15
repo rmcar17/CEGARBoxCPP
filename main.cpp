@@ -37,7 +37,8 @@ static struct argp_option options[] = {
     {"serial", 'd', 0, 0, "Enables seriality."},
     {"euclidean", 'e', 0, 0, "Enables transitivity."},
     {"tense", 'n', 0, 0, "Enables Tense Logic."},
-    {"valid", 'v', 0, 0, "Prove validity"},
+    {"valid", 'a', 0, 0, "Prove validity."},
+    {"verbose", 'v', 0, 0, "Verbosity."},
     {0, 0, 0, 0, 0, 0}};
 
 struct arguments_struct {
@@ -45,6 +46,7 @@ struct arguments_struct {
   SolverConstraints settings;
   bool tense = false;
   bool valid = false;
+  bool verbose = false;
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
@@ -71,8 +73,11 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   case 'n':
     arguments->tense = true;
     break;
-  case 'v':
+  case 'a':
     arguments->valid = true;
+    break;
+  case 'v':
+    arguments->verbose = true;
     break;
   case ARGP_KEY_ARG:
     return 0;
@@ -97,6 +102,11 @@ void solve(arguments_struct &args) {
 #if DEBUG_TIME
   auto start = chrono::steady_clock::now();
 #endif
+  auto start = chrono::steady_clock::now();
+  if (args.verbose) {
+    cout << "Begin" << endl;
+  }
+  auto read = chrono::steady_clock::now();
 #if DEBUG_PROGRESS
   cout << "Begin" << endl;
 #endif
@@ -122,6 +132,10 @@ void solve(arguments_struct &args) {
 #if DEBUG_PROGRESS
   cout << "Parsed: " << formula->toString() << endl;
 #endif
+  auto parse = chrono::steady_clock::now();
+  if (args.verbose) {
+    cout << "Parsed: " << formula->toString() << endl;
+  }
 
   formula = formula->negatedNormalForm();
   // correct = correct->negatedNormalForm();
@@ -135,6 +149,11 @@ void solve(arguments_struct &args) {
   cout << "Negated normal form: " << formula->toString() << endl;
 #endif
 
+  auto nnf = chrono::steady_clock::now();
+  if (args.verbose) {
+    cout << "Negated normal form: " << formula->toString() << endl;
+  }
+
   formula = formula->simplify();
   // correct = correct->simplify();
 
@@ -146,6 +165,11 @@ void solve(arguments_struct &args) {
 #if DEBUG_PROGRESS
   cout << "Simplified: " << formula->toString() << endl;
 #endif
+
+  auto simplify = chrono::steady_clock::now();
+  if (args.verbose) {
+    cout << "Simplified: " << formula->toString() << endl;
+  }
 
   formula = formula->modalFlatten();
   // correct = correct->modalFlatten();
@@ -159,9 +183,20 @@ void solve(arguments_struct &args) {
   cout << "Flattenned: " << formula->toString() << endl;
 #endif
 
+  auto flatten = chrono::steady_clock::now();
+  if (args.verbose) {
+    cout << "Flattenned: " << formula->toString() << endl;
+  }
+
   shared_ptr<Trieform> trie = TrieformFactory::makeTrie(formula, args.settings);
   // shared_ptr<Trieform> otherTrie =
   //     TrieformFactory::makeTrie(correct, args.settings);
+  if (args.verbose) {
+    cout << "Constructed trie" << endl;
+    cout << "Initial trie:" << endl << trie->toString() << endl;
+    cout << "Normal cache:" << endl << trie->getCache().toString() << endl;
+  }
+  auto construct = chrono::steady_clock::now();
 #if DEBUG_PROGRESS
   cout << "Constructed trie" << endl;
 #endif
@@ -193,6 +228,13 @@ void solve(arguments_struct &args) {
   cout << "Reduced cache:" << endl << trie->getCache().toString() << endl;
 #endif
 
+  auto reduce = chrono::steady_clock::now();
+  if (args.verbose) {
+    cout << "Reduced trie" << endl;
+    cout << "Reduced trie:" << endl << trie->toString() << endl;
+    cout << "Reduced cache:" << endl << trie->getCache().toString() << endl;
+  }
+
   if (args.tense) {
     trie->preprocessTense();
   }
@@ -207,6 +249,11 @@ void solve(arguments_struct &args) {
   cout << "Processed trie:" << endl << trie->toString() << endl;
 #endif
 
+  if (args.verbose) {
+    cout << "Preprocessed trie" << endl;
+    cout << "Processed trie:" << endl << trie->toString() << endl;
+  }
+
   trie->removeTrueAndFalse();
   // otherTrie->removeTrueAndFalse();
 
@@ -219,6 +266,11 @@ void solve(arguments_struct &args) {
 #if DEBUG_PROGRESS
   cout << "Prepared SAT" << endl;
 #endif
+
+  auto prepare = chrono::steady_clock::now();
+  if (args.verbose) {
+    cout << "Prepared SAT" << endl;
+  }
 
   bool satisfiable = trie->isSatisfiable();
   if (args.valid) {
@@ -271,4 +323,42 @@ void solve(arguments_struct &args) {
   cout << "SOLVE TIME: " << chrono::duration<double, milli>(solveTime).count()
        << " ms" << endl;
 #endif
+
+  if (args.verbose) {
+    auto solve = chrono::steady_clock::now();
+    cout << "Solved" << endl;
+
+    auto readTime = read - start;
+    auto parseTime = parse - start;
+    auto nnfTime = nnf - start;
+    auto simplifyTime = simplify - start;
+    auto flattenTime = flatten - start;
+    auto constructTime = construct - start;
+    auto reduceTime = reduce - start;
+    auto prepareTime = prepare - start;
+    auto solveTime = solve - start;
+    cout << "READ TIME: " << chrono::duration<double, milli>(readTime).count()
+         << " ms" << endl;
+    cout << "PARSE TIME: " << chrono::duration<double, milli>(parseTime).count()
+         << " ms" << endl;
+    cout << "NNF TIME: " << chrono::duration<double, milli>(nnfTime).count()
+         << " ms" << endl;
+    cout << "SIMPLIFY TIME: "
+         << chrono::duration<double, milli>(simplifyTime).count() << " ms"
+         << endl;
+    cout << "FLATTEN TIME: "
+         << chrono::duration<double, milli>(flattenTime).count() << " ms"
+         << endl;
+    cout << "CONSTRUCT TIME: "
+         << chrono::duration<double, milli>(constructTime).count() << " ms"
+         << endl;
+    cout << "REDUCE TIME: "
+         << chrono::duration<double, milli>(reduceTime).count() << " ms"
+         << endl;
+    cout << "PREPARE TIME: "
+         << chrono::duration<double, milli>(prepareTime).count() << " ms"
+         << endl;
+    cout << "SOLVE TIME: " << chrono::duration<double, milli>(solveTime).count()
+         << " ms" << endl;
+  }
 }

@@ -11,13 +11,14 @@ Run ``./compile.sh`` to compile CEGARBox
 ## Input Formula
 CEGARBox accepts file input. Input is terminated by a newline and valid input formula are defined by the following grammar:
 ```
-Formula := ImpFormula <=> ImpFormula || ImpFormula
-ImpFormula := OrFormula => OrFormula || OrFormula
-OrFormula := AndFormula | AndFormula || AndFormula
-AndFormula := FormulaRest & FormulaRest || FormulaRest
-FormulaRest := (Formula) || ~FormulaRest || [Int]FormulaRest || <Int>FormulaRest || $true || $false || Atom
-Atom := Alphanumeric String
+Index ::= Nat || -Nat
+
+Formula ::=
+ atom || $true || $false || ~Formula ||
+ [Index] Formula || <Index> Formula || []Formula || <> Formula  || Formula | Formula || Formula & Formula || Formula => Formula || Formula <=> Formula
 ```
+
+Here, negative numbers are used to define converse for tense logic. For example ``[-1]`` is the converse of ``[1]``.
 
 ## Run Theorem Prover
 
@@ -30,11 +31,13 @@ Options:
 * Transitivity: ``--transitive`` or ``-4``
 * Seriality: ``--serial`` or ``-d``
 * Euclidean: ``--euclidean`` or ``-e``
-* Valid (whether input formula is valid): ``--valid`` or ``-v``
+* Valid (whether input formula is valid): ``--valid`` or ``-a``
+* Tense: ``--tense`` or `-n`
+* Verbose: ``--verbose`` or `-v`
 
 ## Benchmarks
 
-MQBF benchmarks can be downloaded from [here](http://www.cril.univ-artois.fr/~montmirail/mosaic/#)
+MQBF, 3CNF and LWB_K benchmarks can be downloaded from [here](http://www.cril.univ-artois.fr/~montmirail/mosaic/#)
 
 Use ``Experiment/convert.py`` to convert the benchmarks into a valid format.
 

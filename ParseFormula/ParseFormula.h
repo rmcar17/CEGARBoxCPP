@@ -11,10 +11,11 @@
 #include "../Formula/Or/Or.h"
 #include "../Formula/True/True.h"
 #include <assert.h>
+#include <fstream>
 #include <memory>
+#include <stdexcept>
 #include <stdio.h>
 #include <string>
-#include <fstream>
 
 using namespace std;
 
@@ -29,7 +30,7 @@ private:
   char getChar();
 
   bool compare(string compareString);
-  string s; 
+  string s;
   string *file;
   size_t index = 0;
 

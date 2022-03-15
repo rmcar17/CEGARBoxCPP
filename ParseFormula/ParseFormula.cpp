@@ -32,7 +32,16 @@ shared_ptr<Formula> ParseFormula::parseRest() {
     while (isspace(getChar()))
       ++index;
 
-    assert(getChar() == ')');
+    if (getChar() != ')') {
+      if (getChar() == '%') {
+        throw runtime_error("Unexpected character at position " +
+                            to_string(index) +
+                            " got end of file but expected )");
+      }
+      throw runtime_error("Unexpected character at position " +
+                          to_string(index) + " got " + getChar() +
+                          " but expected )");
+    }
     ++index;
 
     return inside;
@@ -51,7 +60,16 @@ shared_ptr<Formula> ParseFormula::parseRest() {
       ++index;
     }
 
-    assert(getChar() == ']');
+    if (getChar() != ']') {
+      if (getChar() == '%') {
+        throw runtime_error("Unexpected character at position " +
+                            to_string(index) +
+                            " got end of file but expected ]");
+      }
+      throw runtime_error("Unexpected character at position " +
+                          to_string(index) + " got " + getChar() +
+                          " but expected ]");
+    }
     ++index;
 
     shared_ptr<Formula> rest = parseRest();
@@ -90,7 +108,16 @@ shared_ptr<Formula> ParseFormula::parseRest() {
       ++index;
     }
 
-    assert(getChar() == '>');
+    if (getChar() != '>') {
+      if (getChar() == '%') {
+        throw runtime_error("Unexpected character at position " +
+                            to_string(index) +
+                            " got end of file but expected >");
+      }
+      throw runtime_error("Unexpected character at position " +
+                          to_string(index) + " got " + getChar() +
+                          " but expected >");
+    }
     ++index;
 
     shared_ptr<Formula> rest = parseRest();
@@ -133,10 +160,11 @@ shared_ptr<Formula> ParseFormula::parseRest() {
     return Atom::create(name);
   }
 
-  while (getChar() != '%') {
-    index++;
+  if (getChar() == '%') {
+    throw runtime_error("Unexpected end of file");
   }
-  assert(false);
+  throw runtime_error("Unexpected character at position " + to_string(index) +
+                      " got " + getChar());
 }
 
 shared_ptr<Formula> ParseFormula::parseAnd() {
@@ -286,7 +314,10 @@ shared_ptr<Formula> ParseFormula::parseFormula() {
   while (isspace(getChar()))
     ++index;
 
-  // assert(getChar() == '%');
+  if (getChar() != '%') {
+    throw runtime_error("Unexpected character at position " + to_string(index) +
+                        " got " + getChar());
+  }
 
   return formula;
 }
