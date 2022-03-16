@@ -12,9 +12,9 @@ Run ``./compile.sh`` to compile CEGARBox
 CEGARBox accepts file input. Input is terminated by a newline and valid input formula are defined by the following grammar:
 ```
 Index ::= Nat || -Nat
-
+Atom ::= Alphanumeric String
 Formula ::=
- atom || $true || $false || ~Formula ||
+ Atom || $true || $false || ~Formula ||
  [Index] Formula || <Index> Formula || []Formula || <> Formula  || Formula | Formula || Formula & Formula || Formula => Formula || Formula <=> Formula
 ```
 
