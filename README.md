@@ -6,6 +6,8 @@ All files in this repository were authored by Robert McArthur.
 This project requires minisat installed to run and compile. Instruction for installing minisat are available [here](https://github.com/niklasso/minisat).
 
 ## Compile
+A statically compiled file is already available in the repo - compiled on Ubuntu 20.04.3.
+
 Run ``./compile.sh`` to compile CEGARBox
 
 ## Input Formula
@@ -15,7 +17,9 @@ Index ::= Nat || -Nat
 Atom ::= Alphanumeric String
 Formula ::=
  Atom || $true || $false || ~Formula ||
- [Index] Formula || <Index> Formula || []Formula || <> Formula  || Formula | Formula || Formula & Formula || Formula => Formula || Formula <=> Formula
+ [Index] Formula || <Index> Formula || []Formula || <>Formula || 
+ Formula | Formula || Formula & Formula || Formula => Formula || 
+ Formula <=> Formula || (Formula) 
 ```
 
 Here, negative numbers are used to define converse for tense logic. For example ``[-1]`` is the converse of ``[1]``.
@@ -38,6 +42,7 @@ Options:
 ## Benchmarks
 
 MQBF, 3CNF and LWB_K benchmarks can be downloaded from [here](http://www.cril.univ-artois.fr/~montmirail/mosaic/#)
+ALC benchmarks can be downloaded from [here](https://web.archive.org/web/20190305011522/http://users.cecs.anu.edu.au/~rpg/BDDTab/)
 
 Use ``Experiment/convert.py`` to convert the benchmarks into a valid format.
 
